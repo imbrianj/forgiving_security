@@ -20,7 +20,7 @@ preferences {
 
   section("Alarms to go off?") {
     input "alarms", "capability.alarm",  title: "Which Alarms?",       multiple: true, required: false
-    input "lights", "capability.switch", title: "Flash which lights?", multiple: true, required: false
+    input "lights", "capability.switch", title: "Turn on which lights?", multiple: true, required: false
   }
 
   section("Delay for presence lag?") {
