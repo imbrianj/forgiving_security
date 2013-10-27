@@ -9,10 +9,6 @@
  */
 
 preferences {
-  section("Modes to arm alarm?") {
-    input "secureMode", "mode", title: "Mode to arm alarm (Away?)"
-  }
-
   section("Things to secure?") {
     input "contacts", "capability.contactSensor", title: "Contact Sensors", multiple: true, required: false
     input "motions",  "capability.motionSensor",  title: "Motion Sensors",  multiple: true, required: false
@@ -27,13 +23,13 @@ preferences {
     input name: "presenceDelay", type: "number", title: "Seconds (defaults to 15s)", required: false
   }
 
-  section("Notifications") {
+  section("Notifications?") {
     input "sendPushMessage", "enum", title: "Send a push notification?", metadata: [values: ["Yes", "No"]], required: false
     input "phone", "phone", title: "Send a Text Message?", required: false
   }
 
-  section("Message interval (default to every message)") {
-    input name: "messageDelay", type: "number", title: "How Long?", required: false
+  section("Message interval?") {
+    input name: "messageDelay", type: "number", title: "Minutes (default to every message)", required: false
   }
 }
 
@@ -55,6 +51,7 @@ def init() {
 def triggerAlarm(evt) {
   def presenceDelay = presenceDelay ?: 15
 
+  state.triggerMode = location.mode
   state.lastTrigger = now()
 
   log.info("Triggering alarm")
@@ -62,8 +59,8 @@ def triggerAlarm(evt) {
 }
 
 def fireAlarm() {
-  if(location.mode == secureMode) {
-    log.info("Alarm triggered and still in secure mode.")
+  if(location.mode == state.triggerMode) {
+    log.info("Alarm triggered and mode hasn't changed.")
     send("Alarm has been triggered!")
     lights?.on()
     alarms?.both()
@@ -79,7 +76,7 @@ private send(msg) {
 
   if(now() - delay > state.lastMessage) {
     state.lastMessage = now()
-    if (sendPushMessage != "No") {
+    if (sendPushMessage == "Yes") {
       log.debug("Sending push message.")
       sendPush(msg)
     }
@@ -93,6 +90,6 @@ private send(msg) {
   }
 
   else {
-    log.info("Have a message to send, but user requested to not not get it.")
+    log.info("Have a message to send, but user requested to not get it.")
   }
 }
