@@ -15,7 +15,7 @@ preferences {
   }
 
   section("Alarms to go off?") {
-    input "alarms", "capability.alarm",  title: "Which Alarms?",       multiple: true, required: false
+    input "alarms", "capability.alarm",  title: "Which Alarms?",         multiple: true, required: false
     input "lights", "capability.switch", title: "Turn on which lights?", multiple: true, required: false
   }
 
@@ -76,12 +76,12 @@ private send(msg) {
 
   if(now() - delay > state.lastMessage) {
     state.lastMessage = now()
-    if (sendPushMessage == "Yes") {
+    if(sendPushMessage == "Yes") {
       log.debug("Sending push message.")
       sendPush(msg)
     }
 
-    if (phone) {
+    if(phone) {
       log.debug("Sending text message.")
       sendSms(phone, msg)
     }
