@@ -43,31 +43,53 @@ def updated() {
 }
 
 def init() {
-  state.lastClosed = now()
-  subscribe(contacts, "contact.open",  triggerAlarm)
-  subscribe(motions,  "motion.motion", triggerAlarm)
+  state.deviceTriggers = ""
+  state.lastClosed     = now()
+  subscribe(contacts, "contact.open",  triggerContact)
+  subscribe(motions,  "motion.active", triggerMotion)
 }
 
-def triggerAlarm(evt) {
+def triggerContact(evt) {
+  def open = contacts.findAll { it?.latestValue("contact") == "open" }
+  triggerDevice(open)
+}
+
+def triggerMotion(evt) {
+  def movement = motions.findAll { it?.latestValue("motion") == "active" }
+  triggerDevice(movement)
+}
+
+def triggerDevice(devices) {
+  if(state.deviceTriggers.size() > 0) {
+    state.deviceTriggers = state.deviceTriggers + ", " + devices.join(", ")
+  }
+
+  else {
+    state.deviceTriggers = devices.join(", ")
+  }
+
+  triggerAlarm()
+}
+
+def triggerAlarm() {
   def presenceDelay = presenceDelay ?: 15
 
   state.triggerMode = location.mode
   state.lastTrigger = now()
 
-  log.info("Triggering alarm")
   runIn(presenceDelay, "fireAlarm")
 }
 
 def fireAlarm() {
   if(location.mode == state.triggerMode) {
-    log.info("Alarm triggered and mode hasn't changed.")
-    send("Alarm has been triggered!")
+    log.info(state.deviceTriggers + " alarm triggered and mode hasn't changed.")
+    send(state.deviceTriggers + " alarm has been triggered!")
     lights?.on()
     alarms?.both()
   }
 
   else {
-    log.info("Alarm triggered, but it looks like you were just coming home.  Ignoring.")
+    log.info(state.deviceTriggers + " alarm triggered, but it looks like you were just coming home.  Ignoring.")
   }
 }
 
