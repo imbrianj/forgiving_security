@@ -91,6 +91,8 @@ def fireAlarm() {
   else {
     log.info(state.deviceTriggers + " alarm triggered, but it looks like you were just coming home.  Ignoring.")
   }
+
+  state.deviceTriggers = ""
 }
 
 private send(msg) {
