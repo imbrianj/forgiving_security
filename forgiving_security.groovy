@@ -44,7 +44,6 @@ def updated() {
 
 def init() {
   state.deviceTriggers = []
-  state.lastClosed     = now()
   subscribe(contacts, "contact.open",  triggerAlarm)
   subscribe(motions,  "motion.active", triggerAlarm)
 }
