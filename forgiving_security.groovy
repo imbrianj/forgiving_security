@@ -43,6 +43,7 @@ def updated() {
 }
 
 def init() {
+  state.lastTrigger    = now()
   state.deviceTriggers = []
   subscribe(contacts, "contact.open",  triggerAlarm)
   subscribe(motions,  "motion.active", triggerAlarm)
@@ -50,10 +51,18 @@ def init() {
 
 def triggerAlarm(evt) {
   def presenceDelay = presenceDelay ?: 15
+
+  if(now() - (presenceDelay * 1000) > state.lastTrigger) {
+    log.warn("Stale event - ignoring")
+
+    state.deviceTriggers = []
+  }
+
   state.deviceTriggers.add(evt.displayName)
   state.triggerMode = location.mode
   state.lastTrigger = now()
 
+  log.info(evt.displayName + " triggered an alarm.  Waiting for presence lag.")
   runIn(presenceDelay, "fireAlarm")
 }
 
