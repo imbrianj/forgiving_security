@@ -8,6 +8,16 @@
  *  ever present lag in presence detection.
  */
 
+definition(
+  name: "Forgiving Security",
+  namespace: "imbrianj",
+  author: "brian@bevey.org",
+  description: "Alerts you if something happens while you're away.  Has a settable grace period to compensate for presence sensors that may take a few seconds to be noticed.",
+  category: "Safety & Security",
+  iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
+  iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience%402x.png"
+)
+
 preferences {
   section("Things to secure?") {
     input "contacts", "capability.contactSensor", title: "Contact Sensors", multiple: true, required: false
